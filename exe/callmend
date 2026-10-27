@@ -1,0 +1,13 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+$LOAD_PATH.unshift(File.expand_path("../lib", __dir__))
+require "callmend"
+
+inputs = Callmend::Inputs.new(->(path) { File.binread(path) }, -> { $stdin.binmode.read })
+out = Callmend::Output.new
+exit_code = Callmend::Cmd::Cli.run(ARGV, inputs, out)
+
+$stdout.binmode.write(out.stdout)
+$stderr.binmode.write(out.stderr)
+exit exit_code
