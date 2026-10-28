@@ -29,7 +29,7 @@ RSpec.describe Callmend::Cmd::Cli do
     expect(Callmend::Cmd::CheckCommand).to respond_to(:run, :load_schema)
     expect(Callmend::Cmd::GuardCommand).to respond_to(:run)
     expect(described_class::USAGE).to eq(
-      "usage: callmend repair [--pretty] [--report] [--strict] FILE\n       " \
+      "usage: callmend repair [--pretty] [--indent N] [--report] [--strict] FILE\n       " \
       "callmend stream FILE\n       " \
       "callmend check SCHEMA FILE\n       " \
       "callmend guard --schema SCHEMA [--max-tries N] SCRIPT\n"

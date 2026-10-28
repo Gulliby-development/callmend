@@ -28,7 +28,7 @@ The launcher is the same on Windows, macOS and Linux: `ruby exe/callmend COMMAND
 ## Usage
 
 ```text
-usage: callmend repair [--pretty] [--report] [--strict] FILE
+usage: callmend repair [--pretty] [--indent N] [--report] [--strict] FILE
        callmend stream FILE
        callmend check SCHEMA FILE
        callmend guard --schema SCHEMA [--max-tries N] SCRIPT
@@ -42,7 +42,7 @@ Exit codes: 0 success, 1 a content failure (an unrepairable text, a rejected val
 
 | Command | What it does |
 | --- | --- |
-| `repair [--pretty] [--report] [--strict] FILE` | Finds the first JSON object or array in the text, repairs it and prints strict JSON (compact, or indented with `--pretty`). `--report` lists each repair on standard error with its line, column and code (R01 to R13). `--strict` prints no JSON and exits 1 when any repair was needed. |
+| `repair [--pretty] [--indent N] [--report] [--strict] FILE` | Finds the first JSON object or array in the text, repairs it and prints strict JSON (compact, or indented with `--pretty`, or by N spaces with `--indent N`, 1 to 8, which implies `--pretty`). `--report` lists each repair on standard error with its line, column and code (R01 to R13). `--strict` prints no JSON and exits 1 when any repair was needed. |
 | `stream FILE` | Every non-blank line of FILE is one chunk written as a JSON string literal. After chunk K it prints `chunk K: JSON`, `chunk K: (no value)` while there is no `{` or `[` yet, or `chunk K: error: LINE:COL: MESSAGE`. An invalid chunk line exits 2; snapshots already printed stay on standard output. |
 | `check SCHEMA FILE` | Validates FILE against SCHEMA, a subset of JSON Schema: `type`, `enum`, `const`, `minLength`, `maxLength`, `minimum`, `maximum`, `required`, `properties`, `additionalProperties`, `minItems`, `maxItems`, `items`. Prints `ok`, or one `PATH: MESSAGE` line per problem and a count. Both files go through the repairing parser. |
 | `guard --schema SCHEMA [--max-tries N] SCRIPT` | Replays a retry loop against the scripted provider. SCRIPT holds one reply per section, separated by lines that are exactly `---`. Each rejected reply produces feedback that is added to the conversation; the loop stops at the first valid reply or after N attempts (1 to 99, default 3). |
@@ -74,6 +74,11 @@ $ callmend repair --pretty b.json
   "city": "Oslo",
   "days": 2.0,
   "ok": true
+}
+$ callmend repair --indent 4 a.json
+{
+    "city": "Paris",
+    "days": 3
 }
 $ callmend repair --strict b.json
 stderr: b.json:1:1: R02 text before the value skipped

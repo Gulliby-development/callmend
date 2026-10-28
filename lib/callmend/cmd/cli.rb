@@ -11,7 +11,7 @@ module Callmend
   module Cmd
     module Cli
       USAGE = <<~TEXT
-        usage: callmend repair [--pretty] [--report] [--strict] FILE
+        usage: callmend repair [--pretty] [--indent N] [--report] [--strict] FILE
                callmend stream FILE
                callmend check SCHEMA FILE
                callmend guard --schema SCHEMA [--max-tries N] SCRIPT
@@ -61,7 +61,7 @@ module Callmend
       def option_spec(command)
         case command
         when "repair"
-          { "--pretty" => "flag", "--report" => "flag", "--strict" => "flag" }
+          { "--pretty" => "flag", "--indent" => "value", "--report" => "flag", "--strict" => "flag" }
         when "guard"
           { "--schema" => "value", "--max-tries" => "value" }
         else
