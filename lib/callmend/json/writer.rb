@@ -7,8 +7,8 @@ module Callmend
     module Writer
       module_function
 
-      def dump(value, pretty: false)
-        render(value, pretty, 0)
+      def dump(value, pretty: false, width: 2)
+        render(value, pretty, 0, width)
       end
 
       def quote(text)
@@ -29,51 +29,51 @@ module Callmend
         quoted << "\""
       end
 
-      def render(value, pretty, depth)
+      def render(value, pretty, depth, width)
         case value
         when NilClass then "null"
         when TrueClass then "true"
         when FalseClass then "false"
         when String then quote(value)
         when Num then value.text
-        when Array then render_array(value, pretty, depth)
-        when Hash then render_hash(value, pretty, depth)
+        when Array then render_array(value, pretty, depth, width)
+        when Hash then render_hash(value, pretty, depth, width)
         else raise TypeError, "unsupported JSON value: #{value.class}"
         end
       end
       private_class_method :render
 
-      def render_array(values, pretty, depth)
+      def render_array(values, pretty, depth, width)
         return "[]" if values.empty?
 
         if pretty
           contents = values.map do |value|
-            "#{indent(depth + 1)}#{render(value, true, depth + 1)}"
+            "#{indent(depth + 1, width)}#{render(value, true, depth + 1, width)}"
           end.join(",\n")
-          "[\n#{contents}\n#{indent(depth)}]"
+          "[\n#{contents}\n#{indent(depth, width)}]"
         else
-          "[#{values.map { |value| render(value, false, depth + 1) }.join(",")}]"
+          "[#{values.map { |value| render(value, false, depth + 1, width) }.join(",")}]"
         end
       end
       private_class_method :render_array
 
-      def render_hash(values, pretty, depth)
+      def render_hash(values, pretty, depth, width)
         return "{}" if values.empty?
 
         if pretty
           contents = values.map do |key, value|
-            "#{indent(depth + 1)}#{quote(key)}: #{render(value, true, depth + 1)}"
+            "#{indent(depth + 1, width)}#{quote(key)}: #{render(value, true, depth + 1, width)}"
           end.join(",\n")
-          "{\n#{contents}\n#{indent(depth)}}"
+          "{\n#{contents}\n#{indent(depth, width)}}"
         else
-          contents = values.map { |key, value| "#{quote(key)}:#{render(value, false, depth + 1)}" }
+          contents = values.map { |key, value| "#{quote(key)}:#{render(value, false, depth + 1, width)}" }
           "{#{contents.join(",")}}"
         end
       end
       private_class_method :render_hash
 
-      def indent(depth)
-        "  " * depth
+      def indent(depth, width)
+        " " * (width * depth)
       end
       private_class_method :indent
     end
