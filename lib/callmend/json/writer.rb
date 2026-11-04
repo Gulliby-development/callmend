@@ -7,8 +7,8 @@ module Callmend
     module Writer
       module_function
 
-      def dump(value, pretty: false, width: 2)
-        render(value, pretty, 0, width)
+      def dump(value, pretty: false, width: 2, sort_keys: false)
+        render(value, pretty, 0, width, sort_keys)
       end
 
       def quote(text)
@@ -29,44 +29,45 @@ module Callmend
         quoted << "\""
       end
 
-      def render(value, pretty, depth, width)
+      def render(value, pretty, depth, width, sort_keys)
         case value
         when NilClass then "null"
         when TrueClass then "true"
         when FalseClass then "false"
         when String then quote(value)
         when Num then value.text
-        when Array then render_array(value, pretty, depth, width)
-        when Hash then render_hash(value, pretty, depth, width)
+        when Array then render_array(value, pretty, depth, width, sort_keys)
+        when Hash then render_hash(value, pretty, depth, width, sort_keys)
         else raise TypeError, "unsupported JSON value: #{value.class}"
         end
       end
       private_class_method :render
 
-      def render_array(values, pretty, depth, width)
+      def render_array(values, pretty, depth, width, sort_keys)
         return "[]" if values.empty?
 
         if pretty
           contents = values.map do |value|
-            "#{indent(depth + 1, width)}#{render(value, true, depth + 1, width)}"
+            "#{indent(depth + 1, width)}#{render(value, true, depth + 1, width, sort_keys)}"
           end.join(",\n")
           "[\n#{contents}\n#{indent(depth, width)}]"
         else
-          "[#{values.map { |value| render(value, false, depth + 1, width) }.join(",")}]"
+          "[#{values.map { |value| render(value, false, depth + 1, width, sort_keys) }.join(",")}]"
         end
       end
       private_class_method :render_array
 
-      def render_hash(values, pretty, depth, width)
+      def render_hash(values, pretty, depth, width, sort_keys)
         return "{}" if values.empty?
 
+        members = sort_keys ? values.sort_by { |key, _value| key } : values.to_a
         if pretty
-          contents = values.map do |key, value|
-            "#{indent(depth + 1, width)}#{quote(key)}: #{render(value, true, depth + 1, width)}"
+          contents = members.map do |key, value|
+            "#{indent(depth + 1, width)}#{quote(key)}: #{render(value, true, depth + 1, width, sort_keys)}"
           end.join(",\n")
           "{\n#{contents}\n#{indent(depth, width)}}"
         else
-          contents = values.map { |key, value| "#{quote(key)}:#{render(value, false, depth + 1, width)}" }
+          contents = members.map { |key, value| "#{quote(key)}:#{render(value, false, depth + 1, width, sort_keys)}" }
           "{#{contents.join(",")}}"
         end
       end
