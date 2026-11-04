@@ -37,7 +37,8 @@ module Callmend
         return 1 if strict && repaired
 
         pretty = options.flag?("--pretty") || options.settings.key?("--indent")
-        out.write_out("#{Json::Writer.dump(result.value, pretty: pretty, width: width)}\n")
+        sort_keys = options.flag?("--sort-keys")
+        out.write_out("#{Json::Writer.dump(result.value, pretty: pretty, width: width, sort_keys: sort_keys)}\n")
         0
       end
 
